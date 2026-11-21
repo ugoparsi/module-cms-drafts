@@ -4,17 +4,20 @@ Create a disabled draft from an existing CMS page or static block. The editor op
 
 ## Install
 
-Use Maho 27.1 or later in the 27.x series and PHP 8.5.1 or later. Add the module to the store's Composer project.
+This preview requires PHP 8.5.1 or later and a Maho 27.1 development checkout. It was tested with Maho `main` at `d57ea65a13`. Validation against a stable Maho 27.1 release is pending.
+
+From the Maho source checkout, add the GitHub repository and install the module's `main` branch.
 
 ```bash
-composer require ugoparsi/module-cms-drafts
+composer config repositories.cms-drafts vcs https://github.com/ugoparsi/module-cms-drafts
+COMPOSER_ROOT_VERSION=27.1.x-dev composer require ugoparsi/module-cms-drafts:dev-main
 ```
 
-To install from a local checkout, place the module next to the store and add it as a Composer path repository.
+If you already have a checkout of the module's `main` branch next to Maho as `module-cms-drafts`, use a path repository. Run these commands from the Maho checkout.
 
 ```bash
 composer config repositories.cms-drafts path ../module-cms-drafts
-composer require ugoparsi/module-cms-drafts:dev-main
+COMPOSER_ROOT_VERSION=27.1.x-dev composer require ugoparsi/module-cms-drafts:dev-main
 ```
 
 ## Create a draft
@@ -32,3 +35,7 @@ Install the module in a local Maho source checkout with the `home` sample data p
 ```bash
 vendor/bin/pest vendor/ugoparsi/module-cms-drafts/tests/Integration/CmsDraftsTest.php
 ```
+
+## License
+
+PHP source and tests use [OSL-3.0](LICENSE.txt). Layouts, templates, module configuration and translations use [AFL-3.0](LICENSE_AFL.txt).

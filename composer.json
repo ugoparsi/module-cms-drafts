@@ -2,9 +2,9 @@
     "name": "ugoparsi/module-cms-drafts",
     "description": "Create disabled drafts from existing Maho pages and static blocks.",
     "type": "maho-module",
-    "license": ["OSL-3.0", "AFL-3.0"],
+    "license": "OSL-3.0 AND AFL-3.0",
     "require": {
         "php": ">=8.5.1",
-        "mahocommerce/maho": "^27.1"
+        "mahocommerce/maho": "~27.1.0"
     }
 }
