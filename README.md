@@ -4,7 +4,7 @@ Create a disabled draft from an existing CMS page or static block. The editor op
 
 ## Install
 
-CMS Drafts 1.0.0 requires PHP 8.5.1 or later. It supports Maho 26.11.3 and later patches in the 26.11 series. The Maho 27.1 preview was tested on `main` at `d57ea65a13`. Validation against a stable Maho 27.1 release is pending.
+CMS Drafts requires PHP 8.5.1 or later. It supports Maho 26.11.3 and later patches in the 26.11 series. The Maho 27.1 preview was tested on `main` at `d57ea65a13`. Validation against a stable Maho 27.1 release is pending.
 
 From the store's Composer project, add the GitHub repository and install the tagged module release.
 
@@ -15,7 +15,7 @@ composer require ugoparsi/module-cms-drafts:^1.0
 
 If you are installing in a Maho source checkout, set `COMPOSER_ROOT_VERSION` for the install command. Use `26.11.3` for a checkout of the Maho 26.11.3 tag or `27.1.x-dev` for the Maho 27.1 development branch.
 
-The module source is available at the [v1.0.0 tag](https://github.com/ugoparsi/module-cms-drafts/tree/v1.0.0).
+The module source is available for each [tagged release](https://github.com/ugoparsi/module-cms-drafts/releases).
 
 ## Create a draft
 
