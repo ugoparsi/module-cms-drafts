@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+SPDX-FileCopyrightText: 2026 Editorial CMS Drafts contributors
+SPDX-License-Identifier: AFL-3.0
+-->
+<layout>
+    <adminhtml_cms_page_edit>
+        <reference name="content">
+            <block type="editorial_cmsdrafts/adminhtml_draft" name="editorial_cmsdrafts_page" template="editorial-cms-drafts/action.phtml" before="cms_page_edit">
+                <action method="setData"><key>source_type</key><value>page</value></action>
+            </block>
+        </reference>
+    </adminhtml_cms_page_edit>
+    <adminhtml_cms_block_edit>
+        <reference name="content">
+            <block type="editorial_cmsdrafts/adminhtml_draft" name="editorial_cmsdrafts_block" template="editorial-cms-drafts/action.phtml" before="cms_block_edit">
+                <action method="setData"><key>source_type</key><value>block</value></action>
+            </block>
+        </reference>
+    </adminhtml_cms_block_edit>
+</layout>

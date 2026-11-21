@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+SPDX-FileCopyrightText: 2026 Editorial CMS Drafts contributors
+SPDX-License-Identifier: AFL-3.0
+-->
+<config>
+    <modules>
+        <Editorial_CmsDrafts>
+            <version>1.0.0</version>
+        </Editorial_CmsDrafts>
+    </modules>
+    <global>
+        <helpers>
+            <editorial_cmsdrafts>
+                <class>Editorial_CmsDrafts_Helper</class>
+            </editorial_cmsdrafts>
+        </helpers>
+        <services>
+            <editorial_cmsdrafts>
+                <class>Editorial_CmsDrafts_Service</class>
+            </editorial_cmsdrafts>
+        </services>
+        <blocks>
+            <editorial_cmsdrafts>
+                <class>Editorial_CmsDrafts_Block</class>
+            </editorial_cmsdrafts>
+        </blocks>
+    </global>
+    <adminhtml>
+        <layout>
+            <updates>
+                <editorial_cmsdrafts>
+                    <file>editorial-cms-drafts.xml</file>
+                </editorial_cmsdrafts>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Editorial_CmsDrafts>
+                    <files>
+                        <default>Editorial_CmsDrafts.csv</default>
+                    </files>
+                </Editorial_CmsDrafts>
+            </modules>
+        </translate>
+    </adminhtml>
+</config>

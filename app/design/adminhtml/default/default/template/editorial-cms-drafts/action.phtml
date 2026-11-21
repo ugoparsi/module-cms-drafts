@@ -1,0 +1,16 @@
+<?php
+/**
+ * SPDX-FileCopyrightText: 2026 Editorial CMS Drafts contributors
+ * SPDX-License-Identifier: AFL-3.0
+ * @package Editorial_CmsDrafts
+ */
+
+/** @var Editorial_CmsDrafts_Block_Adminhtml_Draft $this */
+$action = $this->getDraftUrl();
+?>
+<?php if ($action !== null): ?>
+    <form action="<?= $this->escapeUrl($action) ?>" method="post" class="flex justify-end mb-3">
+        <?= $this->getBlockHtml('formkey') ?>
+        <button class="d-btn d-btn-sm" type="submit"><?= $this->escapeHtml(Mage::helper('editorial_cmsdrafts')->__('Create draft')) ?></button>
+    </form>
+<?php endif ?>
