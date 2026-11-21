@@ -18,33 +18,82 @@ class Editorial_CmsDrafts_Service_Draft
 
     public function createPageDraft(int $sourceId): Mage_Cms_Model_Page
     {
-        $pages = Mage::getService('cms/page');
-        $source = $pages->getById($sourceId);
+        $pages = class_exists(Mage_Cms_Service_Page::class) ? Mage::getService('cms/page') : null;
         $fields = self::PAGE_FIELDS;
-        foreach ($source->getResource()->getCustomAttributes() as $code => $attribute) {
-            if (!$attribute->getIsUnique()) {
-                $fields[] = $code;
+        if ($pages === null) {
+            $source = Mage::getModel('cms/page');
+            $this->loadSource($source, $sourceId);
+        } else {
+            $source = $pages->getById($sourceId);
+            foreach ($source->getResource()->getCustomAttributes() as $code => $attribute) {
+                if (!$attribute->getIsUnique()) {
+                    $fields[] = $code;
+                }
             }
         }
 
-        $draft = $pages->newPage()->addData(array_intersect_key($source->getData(), array_fill_keys($fields, true)));
-        $draft->addData($this->newIdentity($source))
+        $draft = $pages?->newPage() ?? Mage::getModel('cms/page');
+        $draft->addData(array_intersect_key($source->getData(), array_fill_keys($fields, true)))
+            ->addData($this->newIdentity($source))
             ->setData('stores', (array) $source->getStoreId())
             ->setIsActive(false);
 
-        return $pages->save($draft);
+        if ($pages !== null) {
+            return $pages->save($draft);
+        }
+        $this->validateLayoutUpdates($draft);
+        $draft->save();
+
+        return $draft;
     }
 
     public function createBlockDraft(int $sourceId): Mage_Cms_Model_Block
     {
-        $blocks = Mage::getService('cms/block');
-        $source = $blocks->getById($sourceId);
-        $draft = $blocks->newBlock()->addData($this->newIdentity($source))
+        $blocks = class_exists(Mage_Cms_Service_Block::class) ? Mage::getService('cms/block') : null;
+        if ($blocks === null) {
+            $source = Mage::getModel('cms/block');
+            $this->loadSource($source, $sourceId);
+        } else {
+            $source = $blocks->getById($sourceId);
+        }
+
+        $draft = $blocks?->newBlock() ?? Mage::getModel('cms/block');
+        $draft->addData($this->newIdentity($source))
             ->setContent($source->getContent())
             ->setData('stores', (array) $source->getStoreId())
             ->setIsActive(false);
+        if ($blocks !== null) {
+            return $blocks->save($draft);
+        }
+        $draft->save();
 
-        return $blocks->save($draft);
+        return $draft;
+    }
+
+    private function validateLayoutUpdates(Mage_Cms_Model_Page $draft): void
+    {
+        $errors = new Mage_Core_Exception_Input();
+        foreach (['layout_update_xml', 'custom_layout_update_xml'] as $field) {
+            $xml = (string) $draft->getData($field);
+            if ($xml === '') {
+                continue;
+            }
+            $validator = Mage::getModel('adminhtml/layoutUpdate_validator');
+            if (!$validator->isValid($xml)) {
+                foreach ($validator->getMessages() as $message) {
+                    $errors->addError($field, (string) $message);
+                }
+            }
+        }
+        $errors->throwIfErrors();
+    }
+
+    private function loadSource(Mage_Cms_Model_Page|Mage_Cms_Model_Block $source, int $sourceId): void
+    {
+        $source->load($sourceId);
+        if (!$source->getId()) {
+            throw new Mage_Core_Exception_NoSuchEntity(Mage::helper('editorial_cmsdrafts')->__('The CMS item no longer exists.'));
+        }
     }
 
     /** @return array{title: string, identifier: string} */

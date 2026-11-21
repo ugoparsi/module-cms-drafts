@@ -15,7 +15,6 @@ it('copies the saved content and stores to an independent disabled draft', funct
     expect($source->getId())->not->toBeNull();
 
     $sourceData = $source->getData();
-    $coreService = Mage::getService($model);
     $draftService = Mage::getService('editorial_cmsdrafts/draft');
     $createDraft = $type === 'page' ? $draftService->createPageDraft(...) : $draftService->createBlockDraft(...);
     $first = null;
@@ -23,7 +22,7 @@ it('copies the saved content and stores to an independent disabled draft', funct
     try {
         $first = $createDraft((int) $source->getId());
         $second = $createDraft((int) $source->getId());
-        $saved = $coreService->getById((int) $first->getId());
+        $saved = Mage::getModel($model)->load($first->getId());
 
         expect($saved->getId())->not->toBe($source->getId())
             ->and($saved->getIsActive())->toBeFalse()
@@ -39,12 +38,12 @@ it('copies the saved content and stores to an independent disabled draft', funct
                 ->and($saved->getMetaDescription())->toBe($source->getMetaDescription());
         }
 
-        $coreService->save($saved->setContent('<p>Edited draft.</p>'));
-        expect($coreService->getById((int) $source->getId())->getData())->toBe($sourceData);
+        $saved->setContent('<p>Edited draft.</p>')->save();
+        expect(Mage::getModel($model)->load($source->getId())->getData())->toBe($sourceData);
     } finally {
         foreach ([$first, $second] as $draft) {
             if ($draft?->getId()) {
-                $coreService->delete($draft);
+                $draft->delete();
             }
         }
     }
@@ -52,6 +51,27 @@ it('copies the saved content and stores to an independent disabled draft', funct
     'page' => ['page', 'Hearthstone'],
     'block' => ['block', 'Category landing: Furniture'],
 ]);
+
+it('applies native page layout validation before saving a draft', function (): void {
+    $source = Mage::getModel('cms/page');
+    $source->setTitle('Invalid layout source')
+        ->setIdentifier('layout-validation-' . bin2hex(random_bytes(6)))
+        ->setIsActive(false)
+        ->setRootTemplate('one_column')
+        ->setLayoutUpdateXml('<reference name="content">')
+        ->setData('stores', [0])
+        ->save();
+    $draft = null;
+
+    try {
+        expect(function () use ($source, &$draft): void {
+            $draft = Mage::getService('editorial_cmsdrafts/draft')->createPageDraft((int) $source->getId());
+        })->toThrow(Mage_Core_Exception_Input::class);
+    } finally {
+        $draft?->delete();
+        $source->delete();
+    }
+});
 
 it('uses the existing CMS permission for each kind of draft', function (?string $allowed, bool $canDraftPage, bool $canDraftBlock): void {
     $actor = Mage::getModel('admin/user')->setUserId(42);

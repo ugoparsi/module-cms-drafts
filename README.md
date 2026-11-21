@@ -4,27 +4,24 @@ Create a disabled draft from an existing CMS page or static block. The editor op
 
 ## Install
 
-This preview requires PHP 8.5.1 or later and a Maho 27.1 development checkout. It was tested with Maho `main` at `d57ea65a13`. Validation against a stable Maho 27.1 release is pending.
+CMS Drafts 1.0.0 requires PHP 8.5.1 or later. It supports Maho 26.11.3 and later patches in the 26.11 series. The Maho 27.1 preview was tested on `main` at `d57ea65a13`. Validation against a stable Maho 27.1 release is pending.
 
-From the Maho source checkout, add the GitHub repository and install the module's `main` branch.
+From the store's Composer project, add the GitHub repository and install the tagged module release.
 
 ```bash
 composer config repositories.cms-drafts vcs https://github.com/ugoparsi/module-cms-drafts
-COMPOSER_ROOT_VERSION=27.1.x-dev composer require ugoparsi/module-cms-drafts:dev-main
+composer require ugoparsi/module-cms-drafts:^1.0
 ```
 
-If you already have a checkout of the module's `main` branch next to Maho as `module-cms-drafts`, use a path repository. Run these commands from the Maho checkout.
+If you are installing in a Maho source checkout, set `COMPOSER_ROOT_VERSION` for the install command. Use `26.11.3` for a checkout of the Maho 26.11.3 tag or `27.1.x-dev` for the Maho 27.1 development branch.
 
-```bash
-composer config repositories.cms-drafts path ../module-cms-drafts
-COMPOSER_ROOT_VERSION=27.1.x-dev composer require ugoparsi/module-cms-drafts:dev-main
-```
+The module source is available at the [v1.0.0 tag](https://github.com/ugoparsi/module-cms-drafts/tree/v1.0.0).
 
 ## Create a draft
 
 Open a saved page under **CMS > Pages** or a saved block under **CMS > Static Blocks**. Select **Create draft** to open a disabled copy. Maho applies the same permission as saving a page or managing a block.
 
-The draft gets its own title and identifier. It keeps the last saved content and store views. Page drafts also keep the saved layout, design schedule, metadata and non-unique custom attributes.
+The draft gets its own title and identifier. It keeps the last saved content and store views. Page drafts also keep the saved layout, design schedule and metadata. On the Maho 27.1 development branch, page drafts also keep non-unique custom attributes.
 
 Maho applies its normal save rules to the draft. Unique custom attributes use the defaults for a new page. If a required attribute needs a fresh value, Maho displays the validation error so you can create a new page with a valid value.
 
