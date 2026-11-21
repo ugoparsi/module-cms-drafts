@@ -7,14 +7,14 @@ Create a disabled draft from an existing CMS page or static block. The editor op
 Use Maho 27.1 or later in the 27.x series and PHP 8.5.1 or later. Add the module to the store's Composer project.
 
 ```bash
-composer require editorial/cms-drafts
+composer require ugoparsi/module-cms-drafts
 ```
 
 To install from a local checkout, place the module next to the store and add it as a Composer path repository.
 
 ```bash
-composer config repositories.editorial-drafts path ../cms-drafts
-composer require editorial/cms-drafts:dev-main
+composer config repositories.cms-drafts path ../module-cms-drafts
+composer require ugoparsi/module-cms-drafts:dev-main
 ```
 
 ## Create a draft
@@ -30,5 +30,5 @@ Maho applies its normal save rules to the draft. Unique custom attributes use th
 Install the module in a local Maho source checkout with the `home` sample data pack. From the store checkout, run the module tests with Maho's Pest configuration.
 
 ```bash
-vendor/bin/pest vendor/editorial/cms-drafts/tests/Integration/CmsDraftsTest.php
+vendor/bin/pest vendor/ugoparsi/module-cms-drafts/tests/Integration/CmsDraftsTest.php
 ```
