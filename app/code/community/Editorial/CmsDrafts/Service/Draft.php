@@ -18,29 +18,21 @@ class Editorial_CmsDrafts_Service_Draft
 
     public function createPageDraft(int $sourceId): Mage_Cms_Model_Page
     {
-        $pages = class_exists(Mage_Cms_Service_Page::class) ? Mage::getService('cms/page') : null;
-        $fields = self::PAGE_FIELDS;
-        if ($pages === null) {
-            $source = Mage::getModel('cms/page');
-            $this->loadSource($source, $sourceId);
-        } else {
+        if (class_exists(Mage_Cms_Service_Page::class)) {
+            $pages = $this->getCmsService('cms/page', Mage_Cms_Service_Page::class);
             $source = $pages->getById($sourceId);
+            $fields = self::PAGE_FIELDS;
             foreach ($source->getResource()->getCustomAttributes() as $code => $attribute) {
                 if (!$attribute->getIsUnique()) {
                     $fields[] = $code;
                 }
             }
+            return $pages->save($this->preparePageDraft($pages->newPage(), $source, $fields));
         }
 
-        $draft = $pages?->newPage() ?? Mage::getModel('cms/page');
-        $draft->addData(array_intersect_key($source->getData(), array_fill_keys($fields, true)))
-            ->addData($this->newIdentity($source))
-            ->setData('stores', (array) $source->getStoreId())
-            ->setIsActive(false);
-
-        if ($pages !== null) {
-            return $pages->save($draft);
-        }
+        $source = Mage::getModel('cms/page');
+        $this->loadSource($source, $sourceId);
+        $draft = $this->preparePageDraft(Mage::getModel('cms/page'), $source, self::PAGE_FIELDS);
         $this->validateLayoutUpdates($draft);
         $draft->save();
 
@@ -49,25 +41,51 @@ class Editorial_CmsDrafts_Service_Draft
 
     public function createBlockDraft(int $sourceId): Mage_Cms_Model_Block
     {
-        $blocks = class_exists(Mage_Cms_Service_Block::class) ? Mage::getService('cms/block') : null;
-        if ($blocks === null) {
-            $source = Mage::getModel('cms/block');
-            $this->loadSource($source, $sourceId);
-        } else {
+        if (class_exists(Mage_Cms_Service_Block::class)) {
+            $blocks = $this->getCmsService('cms/block', Mage_Cms_Service_Block::class);
             $source = $blocks->getById($sourceId);
-        }
+            $draft = $this->prepareBlockDraft($blocks->newBlock(), $source);
 
-        $draft = $blocks?->newBlock() ?? Mage::getModel('cms/block');
-        $draft->addData($this->newIdentity($source))
-            ->setContent($source->getContent())
-            ->setData('stores', (array) $source->getStoreId())
-            ->setIsActive(false);
-        if ($blocks !== null) {
             return $blocks->save($draft);
         }
+
+        $source = Mage::getModel('cms/block');
+        $this->loadSource($source, $sourceId);
+        $draft = $this->prepareBlockDraft(Mage::getModel('cms/block'), $source);
         $draft->save();
 
         return $draft;
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T> $serviceType
+     * @return T
+     */
+    private function getCmsService(string $alias, string $serviceType): object
+    {
+        $service = Mage::getService($alias);
+        if (!$service instanceof $serviceType) {
+            throw new RuntimeException('The ' . $alias . ' service must extend ' . $serviceType . '.');
+        }
+        return $service;
+    }
+
+    /** @param list<string> $fields */
+    private function preparePageDraft(Mage_Cms_Model_Page $draft, Mage_Cms_Model_Page $source, array $fields): Mage_Cms_Model_Page
+    {
+        return $draft->addData(array_intersect_key($source->getData(), array_fill_keys($fields, true)))
+            ->addData($this->newIdentity($source))
+            ->setData('stores', (array) $source->getStoreId())
+            ->setIsActive(false);
+    }
+
+    private function prepareBlockDraft(Mage_Cms_Model_Block $draft, Mage_Cms_Model_Block $source): Mage_Cms_Model_Block
+    {
+        return $draft->addData($this->newIdentity($source))
+            ->setContent($source->getContent())
+            ->setData('stores', (array) $source->getStoreId())
+            ->setIsActive(false);
     }
 
     private function validateLayoutUpdates(Mage_Cms_Model_Page $draft): void
